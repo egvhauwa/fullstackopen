@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 //import axios from 'axios';
+import Notification from './components/Notification';
 import personService from './services/persons';
 
 const Filter = ({ enterFilter, filter, handleFilterChange }) => (
@@ -48,6 +49,8 @@ const App = () => {
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [filter, setFilter] = useState('');
+  const [statusMessage, setStatusMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
     console.log('effect');
@@ -81,11 +84,30 @@ const App = () => {
                 person.id !== personToUpdate.id ? person : returnedPerson
               )
             );
+            setStatusMessage(`Updated ${returnedPerson.name}`);
+            setTimeout(() => {
+              setStatusMessage(null);
+            }, 5000);
+          })
+          .catch((error) => {
+            setPersons(
+              persons.filter((person) => person.id !== personToUpdate.id)
+            );
+            setErrorMessage(
+              `Information of '${personToUpdate.name}' was already deleted from server`
+            );
+            setTimeout(() => {
+              setErrorMessage(null);
+            }, 5000);
           });
       }
     } else {
       personService.create(personObject).then((returnedPerson) => {
         setPersons(persons.concat(returnedPerson));
+        setStatusMessage(`Added ${returnedPerson.name}`);
+        setTimeout(() => {
+          setStatusMessage(null);
+        }, 5000);
       });
     }
 
@@ -98,6 +120,10 @@ const App = () => {
     if (window.confirm(`Delete ${personToDelete.name}?`)) {
       personService.deleteObject(id).then(() => {
         setPersons(persons.filter((person) => person.id !== id));
+        setStatusMessage(`Deleted ${personToDelete.name}`);
+        setTimeout(() => {
+          setStatusMessage(null);
+        }, 5000);
       });
     }
   };
@@ -128,6 +154,8 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={statusMessage} />
+      <Notification message={errorMessage} error />
       <Filter
         enterFilter={enterFilter}
         filter={filter}
