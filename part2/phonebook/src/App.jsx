@@ -90,25 +90,35 @@ const App = () => {
             }, 5000);
           })
           .catch((error) => {
-            setPersons(
-              persons.filter((person) => person.id !== personToUpdate.id)
-            );
-            setErrorMessage(
-              `Information of '${personToUpdate.name}' was already deleted from server`
-            );
+            console.log(error);
+            if (error.response.request.status === 404) {
+              setPersons(
+                persons.filter((person) => person.id !== personToUpdate.id)
+              );
+            }
+            setErrorMessage(error.response.data.error);
             setTimeout(() => {
               setErrorMessage(null);
             }, 5000);
           });
       }
     } else {
-      personService.create(personObject).then((returnedPerson) => {
-        setPersons(persons.concat(returnedPerson));
-        setStatusMessage(`Added ${returnedPerson.name}`);
-        setTimeout(() => {
-          setStatusMessage(null);
-        }, 5000);
-      });
+      personService
+        .create(personObject)
+        .then((returnedPerson) => {
+          setPersons(persons.concat(returnedPerson));
+          setStatusMessage(`Added ${returnedPerson.name}`);
+          setTimeout(() => {
+            setStatusMessage(null);
+          }, 5000);
+        })
+        .catch((error) => {
+          console.log(error);
+          setErrorMessage(error.response.data.error);
+          setTimeout(() => {
+            setErrorMessage(null);
+          }, 5000);
+        });
     }
 
     setNewName('');
