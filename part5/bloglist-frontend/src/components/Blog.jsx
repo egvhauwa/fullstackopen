@@ -38,23 +38,25 @@ const Blog = ({ blog, updateBlog, removeBlog, user }) => {
   if (visible === false) {
     return (
       <div style={blogStyle}>
-        {blog.title} {blog.author}{' '}
-        <button onClick={toggleVisibility}>view</button>
+        <div className='blog-title-author'>
+          {blog.title} {blog.author}{' '}
+          <button onClick={toggleVisibility}>view</button>
+        </div>
       </div>
     );
   }
 
   return (
     <div style={blogStyle}>
-      <div>
+      <div className='blog-title-author'>
         {blog.title} {blog.author}{' '}
         <button onClick={toggleVisibility}>hide</button>
       </div>
-      <div>{blog.url}</div>
-      <div>
+      <div className='blog-url'>{blog.url}</div>
+      <div className='blog-likes'>
         {blog.likes} <button onClick={likeBlog}>like</button>
       </div>
-      <div>{blog.user.name}</div>
+      <div className='blog-user-name'>{blog.user.name}</div>
       {user.username === blog.user.username && ( // Check if the user is the owner of the blog
         <div>
           <button onClick={deleteBlog}>delete</button>
