@@ -1,3 +1,5 @@
+import { createSlice } from '@reduxjs/toolkit';
+
 const anecdotesAtStart = [
   'If it hurts, do it more often',
   'Adding manpower to a late software project makes it later!',
@@ -19,15 +21,22 @@ const asObject = (anecdote) => {
 
 const initialState = anecdotesAtStart.map(asObject);
 
-const reducer = (state = initialState, action) => {
-  console.log('state now: ', state);
-  console.log('action', action);
-  switch (action.type) {
-    case 'ADD': {
-      return [...state, action.payload];
-    }
-    case 'VOTE': {
-      const id = action.payload.id;
+const anecdoteSlice = createSlice({
+  name: 'anecdotes',
+  initialState,
+  reducers: {
+    addAnecdote(state, action) {
+      const content = action.payload;
+      //mutable action possible because reduxjs toolkit uses the Immer library
+      state.push({
+        content,
+        id: getId(),
+        votes: 0,
+      });
+      //no return needed because of the mutable action
+    },
+    voteAnecdote(state, action) {
+      const id = action.payload;
       const anecdoteToVote = state.find((anecdote) => anecdote.id === id);
       if (anecdoteToVote) {
         const updatedAnecdote = {
@@ -40,28 +49,9 @@ const reducer = (state = initialState, action) => {
         );
       }
       return state;
-    }
-  }
-
-  return state;
-};
-
-export const addAnecdote = (content) => {
-  return {
-    type: 'ADD',
-    payload: {
-      content,
-      id: getId(),
-      votes: 0,
     },
-  };
-};
+  },
+});
 
-export const voteAnecdote = (id) => {
-  return {
-    type: 'VOTE',
-    payload: { id },
-  };
-};
-
-export default reducer;
+export const { addAnecdote, voteAnecdote } = anecdoteSlice.actions;
+export default anecdoteSlice.reducer;
