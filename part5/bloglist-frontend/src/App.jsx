@@ -67,20 +67,9 @@ const App = () => {
   const createBlog = async (blogObject) => {
     try {
       const blog = await blogService.create(blogObject);
-      //Create a shallow copy of the blog object and simultaneously sets the user property
-      const populatedBlog = {
-        ...blog,
-        user: {
-          username: user.username,
-          name: user.name,
-          id: blog.user.id,
-        },
-      };
-      setBlogs(blogs.concat(populatedBlog));
+      setBlogs(blogs.concat(blog));
       blogFormRef.current.toggleVisibility();
-      setStatusMessage(
-        `A new blog ${populatedBlog.title} by ${populatedBlog.auhtor} added`
-      );
+      setStatusMessage(`A new blog ${blog.title} by ${blog.auhtor} added`);
       setTimeout(() => {
         setStatusMessage(null);
       }, 5000);
@@ -97,24 +86,13 @@ const App = () => {
     console.log(blogObject);
     console.log(id);
     try {
-      const blog = await blogService.update(id, blogObject);
-      //Create a shallow copy of the blog object and simultaneously sets the user property
-      const populatedBlog = {
-        ...blog,
-        user: {
-          username: user.username,
-          name: user.name,
-          id: blog.user.id,
-        },
-      };
+      const updatedBlog = await blogService.update(id, blogObject);
       //Replace blog
       setBlogs(
-        blogs.map((blog) =>
-          blog.id !== populatedBlog.id ? blog : populatedBlog
-        )
+        blogs.map((blog) => (blog.id !== updatedBlog.id ? blog : updatedBlog))
       );
       setStatusMessage(
-        `Blog ${populatedBlog.title} by ${populatedBlog.auhtor} updated`
+        `Blog ${updatedBlog.title} by ${updatedBlog.auhtor} updated`
       );
       setTimeout(() => {
         setStatusMessage(null);
