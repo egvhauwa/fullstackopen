@@ -1,16 +1,8 @@
 import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import {
-  Routes,
-  Route,
-  Link,
-  useNavigate,
-  useLocation,
-} from 'react-router-dom';
+import { Routes, Route, Link } from 'react-router-dom';
 
-import blogService from './services/blogs';
-
-import { setLoggedUser } from './reducers/loggedUserReducer';
+import { initializeLoggedUser } from './reducers/loggedUserReducer';
 import { initializeUsers } from './reducers/usersReducer';
 import { initializeBlogs } from './reducers/blogsReducer';
 
@@ -75,32 +67,33 @@ const Menu = () => {
 };
 
 const App = () => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
-  const location = useLocation();
 
   const loggedUser = useSelector((state) => state.loggedUser);
 
   useEffect(() => {
     dispatch(initializeUsers());
     dispatch(initializeBlogs());
-    const loggedUserJSON = window.localStorage.getItem('loggedUser');
-    if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON);
-      dispatch(setLoggedUser(user));
-      blogService.setToken(user.token);
-    } else {
-      navigate('/login');
-    }
+    dispatch(initializeLoggedUser());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  if (!loggedUser) {
+    return (
+      <div className='container'>
+        <h2>Login</h2>
+        <Notification />
+        <LoginForm />
+      </div>
+    );
+  }
 
   return (
     <div className='container'>
-      {loggedUser && <Menu />}
+      <Menu />
       <Notification />
-
+      <br />
       <Routes>
-        <Route path='/login' element={<LoginForm />} />
         <Route path='/' element={<Blogs />} />
         <Route path='/blogs' element={<Blogs />} />
         <Route path='/blogs/:id' element={<Blog />} />

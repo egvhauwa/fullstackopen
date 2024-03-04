@@ -1,11 +1,8 @@
+import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
-import loginService from '../services/login';
-import blogService from '../services/blogs';
-
-import { setLoggedUser } from '../reducers/loggedUserReducer';
-import { setError } from '../reducers/notificationReducer';
+import { loginUser } from '../reducers/loggedUserReducer';
 
 import { Form, Button } from 'react-bootstrap';
 
@@ -17,23 +14,13 @@ const LoginForm = () => {
     event.preventDefault();
     const username = event.target.username.value;
     const password = event.target.password.value;
-    try {
-      const loggedUser = await loginService.login({ username, password });
-      console.log(loggedUser);
-      window.localStorage.setItem('loggedUser', JSON.stringify(loggedUser));
-      dispatch(setLoggedUser(loggedUser));
-      blogService.setToken(loggedUser.token);
-      navigate('/');
-    } catch (exception) {
-      console.log(exception);
-      dispatch(setError('wrong credentials'));
-      event.target.password.value = '';
-    }
+    dispatch(loginUser({ username, password }));
+    event.target.password.value = '';
+    navigate('/');
   };
 
   return (
     <div>
-      <h2>Login</h2>
       <Form onSubmit={handleLogin}>
         <Form.Group>
           <Form.Label>username:</Form.Label>
